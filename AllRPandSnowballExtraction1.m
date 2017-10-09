@@ -9,9 +9,9 @@ clear
 % %PART 0: USER INPUTS:
 % disp('PART 0: LOAD RAW DATA AND ANNOTATION')
 
-no_channel1 = 20;%T7-FT9%input('Enter first channel number we want: '); %Just enter the number here
-no_channel2 = 16;%P8-O2%input('Enter second channel number we want: '); %Just enter the number here
-TimeBack = 5*60; %This will be the amnt of time before seizure we are paying attention to (in seconds)
+%no_channel1 = 20;%T7-FT9%input('Enter first channel number we want: '); %Just enter the number here
+%no_channel2 = 16;%P8-O2%input('Enter second channel number we want: '); %Just enter the number here
+TimeBack = 0*60; %This will be the amnt of time before seizure we are paying attention to (in seconds)
 %
 % %For snow.m function:
 Hist = zeros(8,30);
@@ -27,7 +27,7 @@ Train = [];
 % %vectors by converting them into strings
 % %figure
 
-patient_num=[14];
+patient_num=[1]; %NOT Ch 17
 
 
 fileLength = [42,35,38,42,39,18,19,20,19,25,35,24,33,26,40,19,0,36,30,29,33,31,9,22]; %The corresponding number of files in each patient
@@ -75,10 +75,10 @@ for i = 1:length(patient_num)
     end
     
     fprintf('With a maximum of %d Seizure files for patient %d.\n',file_size{2,patient_num(i)},patient_num(i));
-    NumS = input('How many Seizure files would you like to analyze?\n');
+    NumS = 2;%input('How many Seizure files would you like to analyze?\n');
     
     fprintf('\nWith a maximum of %d NON-Seizure files for patient %d.\n',NON{patient_num(i)},patient_num(i));
-    Non_S = input('How many NON Seizure files would you like to analyze?\n');
+    Non_S = 1;%input('How many NON Seizure files would you like to analyze?\n');
     TempS = {};
     for h = 1:file_size{2,patient_num(i)}
         if file_size{3,patient_num(i)}(h)<10
@@ -94,10 +94,14 @@ for i = 1:length(patient_num)
     Select_NON = [];
     Select_S = [];
     while size(unique(Select_NON),1) + size(unique(Select_S),1) ~= NumS+Non_S
-        Select_NON = datasample(NON_files{patient_num(i)},Non_S);
-        Select_NON = sort(Select_NON);
-        Select_S = datasample(S_files{patient_num(i)},NumS);
-        Select_S = sort(Select_S);
+        if Non_S ~= 0
+            Select_NON = datasample(NON_files{patient_num(i)},Non_S);
+            Select_NON = sort(Select_NON);
+        end
+        if NumS ~= 0
+            Select_S = datasample(S_files{patient_num(i)},NumS);
+            Select_S = sort(Select_S);
+        end
     end
     True = [Select_NON; Select_S];
     True = sort(True);
@@ -106,22 +110,114 @@ for i = 1:length(patient_num)
         pathname = strcat('C:\Program Files\Epilepsy-Data\','chb0',num); %Change to where the files are stored
         cd(pathname);
         for p = 1:length(True)
+            if patient_num(i)==11 && str2double(True{p}(7:8)) == 1
+                no_channel1 = 20;
+                no_channel2 = 16;
+            elseif patient_num(i)<11
+                no_channel1 = 20;
+                no_channel2 = 16;
+            elseif patient_num(i)==11 && str2double(True{p}(7:8))~=1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))<11
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))>10 && str2double(True{p}(7:8))<14
+                no_channel1 = 26;
+                no_channel2 = 23;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))>13
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==14
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==15 && str2double(True{p}(7:8))==1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==15 && str2double(True{p}(7:8))>1
+                no_channel1 = 26;
+                no_channel2 = 23;
+            elseif patient_num(i)==18 && str2double(True{p}(7:8))==1
+                no_channel1 = 3;
+                no_channel2 = 22;
+            elseif patient_num(i)==18 && str2double(True{p}(7:8))>1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==19 && str2double(True{p}(7:8))==1
+                no_channel1 = 3;
+                no_channel2 = 22;
+            elseif patient_num(i)==19 && str2double(True{p}(7:8))>1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)>19 && patient_num(i)<23
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)>22
+                no_channel1 = 20;
+                no_channel2 = 16;
+            end
             record_file = True{p}
             X{p} = record_file; %{} means load it as a string, and only specific file p, and store into array X
             file=load(X{p}); %loads it as a structure
-            valTrain=[valTrain,file.record(1:22,:)]; %creates an array in valTrain, and stacks on at the end of the array
-            File_Lengths = [File_Lengths, size(file.record(1:22,:),2)/256];
+            valTrain=[valTrain,file.record([no_channel1 no_channel2],:)]; %creates an array in valTrain, and stacks on at the end of the array
+            File_Lengths = [File_Lengths, size(file.record([no_channel1 no_channel2],:),2)/256];
         end
     else %repeat if patient_num is greater than 9 (does not start with '0')
         patient_file=1:fileLength(patient_num(i));
         pathname = strcat('C:\Program Files\Epilepsy-Data\','chb',num); %Change to where the files are stored
         cd(pathname);
         for p = 1:length(True)
+            if patient_num(i)==11 && str2double(True{p}(7:8)) == 1
+                no_channel1 = 20;
+                no_channel2 = 16;
+            elseif patient_num(i)<11
+                no_channel1 = 20;
+                no_channel2 = 16;
+            elseif patient_num(i)==11 && str2double(True{p}(7:8))~=1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))<11
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))>10 && str2double(True{p}(7:8))<14
+                no_channel1 = 26;
+                no_channel2 = 23;
+            elseif patient_num(i)==12 && str2double(True{p}(7:8))>13
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==14
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==15 && str2double(True{p}(7:8))==1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==15 && str2double(True{p}(7:8))>1
+                no_channel1 = 26;
+                no_channel2 = 23;
+            elseif patient_num(i)==18 && str2double(True{p}(7:8))==1
+                no_channel1 = 3;
+                no_channel2 = 22;
+            elseif patient_num(i)==18 && str2double(True{p}(7:8))>1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)==19 && str2double(True{p}(7:8))==1
+                no_channel1 = 3;
+                no_channel2 = 22;
+            elseif patient_num(i)==19 && str2double(True{p}(7:8))>1
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)>19 && patient_num(i)<23
+                no_channel1 = 25;
+                no_channel2 = 22;
+            elseif patient_num(i)>22
+                no_channel1 = 20;
+                no_channel2 = 16;
+            end
             record_file = True{p}
             X{p} = record_file; %{} means load it as a string, and only specific file p, and store into array X
             file=load(X{p}); %loads it as a structure
-            valTrain=[valTrain,file.record(1:22,:)]; %creates an array in valTrain, and stacks on at the end of the array
-            File_Lengths = [File_Lengths, size(file.record(1:22,:),2)/256];
+            valTrain=[valTrain,file.record([no_channel1 no_channel2],:)]; %creates an array in valTrain, and stacks on at the end of the array
+            File_Lengths = [File_Lengths, size(file.record([no_channel1 no_channel2],:),2)/256];
         end
     end
     record = valTrain;
@@ -198,10 +294,10 @@ end
 %PART 2: Extract the RP Features
 
 cd('C:\Users\chand_000\Documents\Cerebro') %Change to where the files are stored
-[PSD] = PSDs(no_channel1, record);
+[PSD] = PSDs(1, record);
 Feature1 = PSD; %Feature to compare
 
-[PSD] = PSDs(no_channel2, record);
+[PSD] = PSDs(2, record);
 Feature2 = PSD; %Feature to compare
 
 signal1 = Feature1(:,:); %SeizureStart-15*60:SeizureEnd
@@ -258,7 +354,7 @@ P_L_V = abs(sum(exp(i*RP)/length(RP))); %Phase Locking Value
 %Part 4: Create Training Data:
 Train = [Train, [anno(phase1start:phase1end);snowball(:,phase1start:phase1end);snowphase;RP]];
 toc; %tells us how long a run takes
-beep
+%beep
 
 
 Train= Train';
