@@ -23,7 +23,7 @@ Test = [];
 % %vectors by converting them into strings
 % %figure
 
-patient_num=[4];
+patient_num=[6];
 i = 1;
 
 fileLength = [42,35,38,42,39,18,19,20,19,25,35, 24,33,26,40,19,0,36,30,29,33,31,9,22]; %The corresponding number of files in each patient
@@ -86,7 +86,7 @@ for i = 1:length(patient_num)
     
     %% Processing the Data
     fprintf('\nWith %d Seizure files left for patient %d.\n',size(S_files{patient_num(i)},1),patient_num(i))
-    S_t = 1;%input('How many Seizure files would you like to analyze?\n');
+    S_t = 2;%input('How many Seizure files would you like to analyze?\n');
     
     fprintf('\nWith %d NON-Seizure files left for patient %d.\n',size(NON_files{patient_num(i)},1),patient_num(i))
     Non_St = 0;%input('How many NON Seizure files would you like to analyze?\n');
@@ -163,7 +163,7 @@ for i = 1:length(patient_num)
             X{p} = record_file; %{} means load it as a string, and only specific file p, and store into array X
             file=load(X{p}); %loads it as a structure
             valTest=[valTest,file.record([no_channel1 no_channel2],:)]; %creates an array in valTrain, and stacks on at the end of the array
-            File_Lengths = [File_Lengths, size(file.record([no_channel1 no_channel2],:),2)/256];
+            File_Lengths1 = [File_Lengths1, size(file.record([no_channel1 no_channel2],:),2)/256];
         end
     else %repeat if patient_num is greater than 9 (does not start with '0')
         patient_file=1:fileLength(patient_num(i));
@@ -220,7 +220,7 @@ for i = 1:length(patient_num)
             X{p} = record_file; %{} means load it as a string, and only specific file p, and store into array X
             file=load(X{p}); %loads it as a structure
             valTest=[valTest,file.record([no_channel1 no_channel2],:)]; %creates an array in valTrain, and stacks on at the end of the array
-            File_Lengths = [File_Lengths, size(file.record([no_channel1 no_channel2],:),2)/256];
+            File_Lengths1 = [File_Lengths1, size(file.record([no_channel1 no_channel2],:),2)/256];
         end
     end
     record = valTest;
