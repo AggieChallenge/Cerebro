@@ -1,20 +1,34 @@
 library(randomForest)
 library(caret)
-attach(training_chb01)
-set.seed(1)
+library(xlsx)
+library(rJava)
+library(unbalanced)
+
+installed(1)
+
+training_chb01<- read.csv("training-chb01.csv", header = TRUE)
 
 print(table(training_chb01$Y))
-print(table(testing_chb01$Y))
+#print(table(testing_chb01$Y))
 
 #SMOTE training data
 training_chb01=as.data.frame(training_chb01)
 library(DMwR)
 set.seed(1)
 training_chb01$Y <- as.factor(training_chb01$Y)
-training_chb01 <- SMOTE(Y ~ .,training_chb01,perc.over =50,perc.under=100)
+training_bal <- ubSMOTE(X=training_chb01[,2:ncol(training_chb01)],Y=training_chb01$Y,  perc.over =100,perc.under = 100, verbose = TRUE)
+training_bal<- data.frame(cbind(training_bal$X, training_bal$Y))
+training_bal$Y<- as.numeric(training_bal$training_bal.Y)
+training_bal$training_bal.Y=NULL
+training_bal$Y<- ifelse(training_bal$Y==1,0,1)
+dim(training_bal)
+print(table(training_bal$Y))
+write.csv()
+  
+training_chb01 <- SMOTE(Y ~ .,training_chb01,perc.over =200, perc.under = 100)
 training_chb01$Y <- as.numeric(training_chb01$Y)
 print(prop.table(table(training_chb01$Y)))
-
+dim(training_chb01)
 #SMOTE testing data
 testing_chb01=as.data.frame(testing_chb01)
 library(DMwR)
@@ -32,8 +46,8 @@ set.seed(1)
 testing_chb01$Y=as.factor(testing_chb01$Y)
 chb01.pred=predict(rf.chb01,newdata=(testing_chb01[,-Y])) #gives the output of the model, how it predicts
 chb01.pred=as.numeric(chb01.pred)
-testing_chb01$Y<- as.factor(testing_chb01$Y)
-training_chb01$Y<- as.numeric(training_chb01$Y)
+testing_chb01$Y<- as.factor(testing_chb01$Y) #how it is actually, subject chb01.pred to parsing
+training_chb01$Y<- as.numeric(training_chb01$Y) 
 
 library(pROC)
 set.seed(1)

@@ -23,7 +23,7 @@ Test = [];
 % %vectors by converting them into strings
 % %figure
 
-patient_num=[6];
+patient_num=[1];
 i = 1;
 
 fileLength = [42,35,38,42,39,18,19,20,19,25,35, 24,33,26,40,19,0,36,30,29,33,31,9,22]; %The corresponding number of files in each patient
@@ -379,6 +379,12 @@ P_L_V = abs(sum(exp(i*RP)/length(RP))); %Phase Locking Value
 %Part 4: Create Training Data:
 Test = [Test, [anno(phase1start:phase1end);snowball(:,phase1start:phase1end);snowphase;RP]];
 toc; %tells us how long a run takes
+
+cd('C:\Users\chand_000\Documents\Excel Files for R');
+Heading = [cellstr('Y') cellstr('X1') cellstr('X2') cellstr('X3') cellstr('X4') cellstr('X5') cellstr('X6') cellstr('X7') cellstr('X8') cellstr('X9') cellstr('X10') cellstr('X11') cellstr('X12') cellstr('X13') cellstr('X14') cellstr('X15') cellstr('X16') cellstr('X17') cellstr('X18') cellstr('X19') cellstr('X20') cellstr('X21') cellstr('X22') cellstr('X23') cellstr('X24')];
+filename = strcat('training-chb',num2str(patient_num),'.xlsx');
+xlswrite(filename, Heading)
+xlswrite(filename,Test, ['A2:Y' num2str(size(Test,1)+1)]);
 
 %beep
 randomforest
