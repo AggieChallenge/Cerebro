@@ -16,7 +16,7 @@ training_chb01=as.data.frame(training_chb01)
 library(DMwR)
 set.seed(1)
 training_chb01$Y <- as.factor(training_chb01$Y)
-training_bal <- ubSMOTE(X=training_chb01[,2:ncol(training_chb01)],Y=training_chb01$Y,  perc.over =100,perc.under = 100, verbose = TRUE)
+training_bal <- ubSMOTE(X=training_chb01[,2:ncol(training_chb01)],Y=training_chb01$Y,  perc.over =500,perc.under = 125, verbose = TRUE)
 training_bal<- data.frame(cbind(training_bal$X, training_bal$Y))
 training_bal$Y<- as.numeric(training_bal$training_bal.Y)
 training_bal$training_bal.Y=NULL
