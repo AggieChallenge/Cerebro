@@ -75,10 +75,10 @@ for i = 1:length(patient_num)
     end
     
     fprintf('With a maximum of %d Seizure files for patient %d.\n',file_size{2,patient_num(i)},patient_num(i));
-    NumS = 4;%input('How many Seizure files would you like to analyze?\n');
+    NumS = input('How many Seizure files would you like to analyze?\n');
     
     fprintf('\nWith a maximum of %d NON-Seizure files for patient %d.\n',NON{patient_num(i)},patient_num(i));
-    Non_S = 1;%input('How many NON Seizure files would you like to analyze?\n');
+    Non_S = input('How many NON Seizure files would you like to analyze?\n');
     TempS = {};
     for h = 1:file_size{2,patient_num(i)}
         if file_size{3,patient_num(i)}(h)<10
@@ -386,10 +386,10 @@ Predictors = flipud(sortcell(Predictors, 2));
 Pvalues = regexp(Predictors(:,1),'\d*','Match');
 
 cd('C:\Users\chand_000\Documents\Excel Files for R');
-Heading = [cellstr('Y') cellstr('X1') cellstr('X2') cellstr('X3') cellstr('X4') cellstr('X5') cellstr('X6') cellstr('X7') cellstr('X8') cellstr('X9') cellstr('X10') cellstr('X11') cellstr('X12') cellstr('X13') cellstr('X14') cellstr('X15') cellstr('X16') cellstr('X17') cellstr('X18') cellstr('X19') cellstr('X20') cellstr('X21') cellstr('X22') cellstr('X23') cellstr('X24')];
-filename = strcat('training-chb',num2str(patient_num),'.xlsx');
-xlswrite(filename, Heading)
-xlswrite(filename,Train, ['A2:Y' num2str(size(Train,1)+1)]);
-
-
+Heading = {'Y'; 'X1'; 'X2'; 'X3'; 'X4'; 'X5'; 'X6'; 'X7'; 'X8'; 'X9'; 'X10'; 'X11'; 'X12'; 'X13'; 'X14'; 'X15'; 'X16'; 'X17'; 'X18'; 'X19'; 'X20'; 'X21'; 'X22'; 'X23'; 'X24'};
+Heading = Heading';
+filename = strcat('training-chb',num2str(patient_num),'.csv');
+FileTrain = [Heading; num2cell(Train)];
+csvwrite(filename,Train)
+cd('C:\Users\chand_000\Documents\Cerebro')
 %testingData1

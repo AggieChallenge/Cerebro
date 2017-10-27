@@ -86,10 +86,10 @@ for i = 1:length(patient_num)
     
     %% Processing the Data
     fprintf('\nWith %d Seizure files left for patient %d.\n',size(S_files{patient_num(i)},1),patient_num(i))
-    S_t = 2;%input('How many Seizure files would you like to analyze?\n');
+    S_t = input('How many Seizure files would you like to analyze?\n');
     
     fprintf('\nWith %d NON-Seizure files left for patient %d.\n',size(NON_files{patient_num(i)},1),patient_num(i))
-    Non_St = 0;%input('How many NON Seizure files would you like to analyze?\n');
+    Non_St = input('How many NON Seizure files would you like to analyze?\n');
     
     Select_NON = datasample(NON_files{patient_num(i)},Non_St);
     Select_NON = sort(Select_NON);
@@ -379,12 +379,15 @@ P_L_V = abs(sum(exp(i*RP)/length(RP))); %Phase Locking Value
 %Part 4: Create Training Data:
 Test = [Test, [anno(phase1start:phase1end);snowball(:,phase1start:phase1end);snowphase;RP]];
 toc; %tells us how long a run takes
-
+Test = Test';
 cd('C:\Users\chand_000\Documents\Excel Files for R');
-Heading = [cellstr('Y') cellstr('X1') cellstr('X2') cellstr('X3') cellstr('X4') cellstr('X5') cellstr('X6') cellstr('X7') cellstr('X8') cellstr('X9') cellstr('X10') cellstr('X11') cellstr('X12') cellstr('X13') cellstr('X14') cellstr('X15') cellstr('X16') cellstr('X17') cellstr('X18') cellstr('X19') cellstr('X20') cellstr('X21') cellstr('X22') cellstr('X23') cellstr('X24')];
-filename = strcat('training-chb',num2str(patient_num),'.xlsx');
-xlswrite(filename, Heading)
-xlswrite(filename,Test, ['A2:Y' num2str(size(Test,1)+1)]);
+Heading = {'Y'; 'X1'; 'X2'; 'X3'; 'X4'; 'X5'; 'X6'; 'X7'; 'X8'; 'X9'; 'X10'; 'X11'; 'X12'; 'X13'; 'X14'; 'X15'; 'X16'; 'X17'; 'X18'; 'X19'; 'X20'; 'X21'; 'X22'; 'X23'; 'X24'};
+Heading = Heading';
+Heading = char(Heading);
+filename = strcat('testing-chb',num2str(patient_num),'.csv');
+%FileTrain = [Heading; num2cell(Test)];
+csvwrite(filename,Test)
 
+cd('C:\Users\chand_000\Documents\Cerebro')
 %beep
-randomforest
+%randomforest

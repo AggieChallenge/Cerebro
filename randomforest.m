@@ -13,6 +13,11 @@ rng default
 %Train = [Train8;Train7(2:9,:);Train12(2:9,:);Train13(2:9,:);Train11(2:9,:)]';
 %Test = [Test8;Test7(2:9,:);Test12(2:9,:);Test13(2:9,:);Test11(2:9,:)]';
 
+cd('C:\Users\chand_000\Documents\Excel Files for R');
+Train = csvread('Patient_train.csv',1,1);
+Test = csvread('Patient_test.csv',1,1);
+cd('C:\Users\chand_000\Documents\Cerebro')
+
 Train= Train';
 features = [Train(str2num(Pvalues{1}{1})+1,:); Train(str2num(Pvalues{2}{1})+1,:); Train(str2num(Pvalues{3}{1})+1,:); Train(str2num(Pvalues{4}{1})+1,:); Train(str2num(Pvalues{5}{1})+1,:); Train(str2num(Pvalues{6}{1})+1,:); Train(str2num(Pvalues{7}{1})+1,:);...
     Train(str2num(Pvalues{8}{1})+1,:); Train(str2num(Pvalues{9}{1})+1,:); Train(str2num(Pvalues{10}{1})+1,:)];
@@ -20,7 +25,7 @@ features = features';
 classLabels = [Train(1,:)];
 classLabels = classLabels';
 % How many trees do you want in the forest? 
-nTrees = 10;
+nTrees = 200;
  
 % Train the TreeBagger (Decision Forest).
 Mdl = TreeBagger(nTrees,features,classLabels,'OOBPredictorImportance','On','PredictorSelection','curvature', 'Method', 'classification');
@@ -47,6 +52,7 @@ h.TickLabelInterpreter = 'none';
  
 % Given a new individual WITH the features and WITHOUT the class label,
 % what should the class label be?
+Test = Test';
 newData1 = [Test(str2num(Pvalues{1}{1})+1,:); Test(str2num(Pvalues{2}{1})+1,:); Test(str2num(Pvalues{3}{1})+1,:); Test(str2num(Pvalues{4}{1})+1,:); Test(str2num(Pvalues{5}{1})+1,:); Test(str2num(Pvalues{6}{1})+1,:); Test(str2num(Pvalues{7}{1})+1,:);...
     Test(str2num(Pvalues{8}{1})+1,:); Test(str2num(Pvalues{9}{1})+1,:); Test(str2num(Pvalues{10}{1})+1,:)];
 newData1 = newData1';
@@ -65,7 +71,7 @@ Specificity = stats.specificity(2)
 SCORES = Mdl.OOBPermutedPredictorDeltaError'; %Larger the value, the more important it is
 %figure, plot(predictedClass), hold on, plot(Test(:,1),'r'), hold on, set(gca,'XTick',(0:3600:size(Test,1)),'XTickLabel',[0:1:size(Test,1)/3600]),xlabel('Time (hours)'), ylabel('Predicted Class'), ylim([-0.5 1.5]), title('Predicted Class Graph');
 figure, plot(scores(:,2)), hold on, plot(Test(:,1),'r'), hold on, set(gca,'XTick',(0:3600:size(Test,1)),'XTickLabel',[0:1:size(Test,1)/3600]),xlabel('Time (hours)'), ylabel('Predicted Class'), ylim([-0.5 1.5]), title('Probability Estimation Graph');
-beep
+%beep
 
 %%
 for t = 1:size(scores,1) 
@@ -121,4 +127,4 @@ for i = 1:1
     end
 end
 end
-    
+toc
