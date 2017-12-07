@@ -7,8 +7,8 @@ library(unbalanced)
 installed(1)
 
 setwd("C:\\Users\\chand_000\\Documents\\Excel Files for R")
-training<- read.csv("training-chb1.csv", header = TRUE)
-testing<- read.csv("testing-chb1.csv", header = TRUE)
+training<- read.csv("training-ch.csv", header = TRUE)
+testing<- read.csv("testing-chb.csv", header = TRUE)
 
 print(table(training$Y))
 print(table(testing$Y))
@@ -18,7 +18,7 @@ training=as.data.frame(training)
 library(DMwR)
 set.seed(1)
 training$Y <- as.factor(training$Y)
-training_bal <- ubSMOTE(X=training[,2:ncol(training)],Y=training$Y,  perc.over =400,perc.under = 100, verbose = TRUE)
+training_bal <- ubSMOTE(X=training[,2:ncol(training)],Y=training$Y,  perc.over = 12000,perc.under = 10, verbose = TRUE)
 training_bal<- data.frame(cbind( training_bal$Y, training_bal$X))
 #training_bal$Y<- as.numeric(training_bal$training_bal.Y)
 #training_bal$training_bal.Y=NULL
@@ -35,7 +35,7 @@ testing=as.data.frame(testing)
 library(DMwR)
 set.seed(1)
 testing$Y <- as.factor(testing$Y)
-testing_bal <- ubSMOTE(X=testing[,2:ncol(training)],Y=testing$Y,  perc.over =400,perc.under = 100, verbose = TRUE)
+testing_bal <- ubSMOTE(X=testing[,2:ncol(testing)],Y=testing$Y,  perc.over =11000,perc.under = 10, verbose = TRUE)
 testing_bal<- data.frame(cbind( testing_bal$Y, testing_bal$X))
 #testing_bal$Y<- as.numeric(testing_bal$testing_bal.Y)
 #testing_bal$testing_bal.Y=NULL
@@ -46,7 +46,6 @@ testing_bal$testing_bal.Y<- ifelse(testing_bal$testing_bal.Y==1,0,1)
 dim(testing_bal)
 print(table(testing_bal$testing_bal.Y))
 write.csv(testing_bal, "Patient_test.csv")
-
 
 #training_chb01 <- SMOTE(Y ~ .,training_chb01,perc.over =200, perc.under = 100)
 #training_chb01$Y <- as.numeric(training_chb01$Y)
@@ -77,22 +76,30 @@ write.csv(testing_bal, "Patient_test.csv")
 #auc <- roc(testing_chb01$Y, chb01.pred)
 #print(auc)
 
-#confusionMatrix(chb01.pred, testing_chb01$Y)
 
-#for (i in 2:(length(chb01.pred)-1))
-#{
-#  if ((chb01.pred[i-1]==chb01.pred[i+1])&&(chb01.pred[i]!=chb01.pred[i-1]))
-#    chb01.pred[i]=chb01.pred[i-1]
-#}
-#library(pROC)
-#set.seed(1)
-#auc <- roc(testing_chb01$Y, chb01.pred)
-#print(auc)
+training <- training_bal
+training$Y<-training_bal$training_bal.Y
+training$training_bal.Y=NULL
 
-#confusionMatrix(chb01.pred, testing_chb01$Y)
-#library(reprtree)
-#reprtree:::plot.getTree(rf.chb01)
-#plot((auc),col="green", lwd=3, main="ROC Curve")
-#partialPlot(rf.chb01,training_chb01,x.var = X4 , which.class=2,xlab=deparse(substitute(X4)), ylab="Partial Dependence",main=paste("Partial Dependence on", deparse(substitute(X4))))
-#varImpPlot(rf.chb01,type=2)
+testing <- testing_bal
+testing$Y<-testing_bal$testing_bal.Y
+testing$testing_bal.Y=NULL
+
+names(training)
+training$Y <- as.factor(training$Y)
+rf.chb01=randomForest(training$Y~.,data=training,ntree=10, type=classification, importance=TRUE,proximity=TRUE) ##Afr#attach(testing_chb01)
+chb01.pred=predict(rf.chb01,newdata=testing[,1:24]) #gives the output of the model, how it predicts
+
+table(chb01.pred)
+for (i in 2:(length(chb01.pred)-1))
+{
+  if ((chb01.pred[i-1]==chb01.pred[i+1])&&(chb01.pred[i]!=chb01.pred[i-1]))
+    chb01.pred[i]=chb01.pred[i-1]
+}
+table(chb01.pred)
+table(testing$Y)
+
+confusionMatrix(chb01.pred, testing$Y)
+
+write.csv(chb01.pred, "Prediction.csv")
 
