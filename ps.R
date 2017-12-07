@@ -100,6 +100,3 @@ table(chb01.pred)
 table(testing$Y)
 
 confusionMatrix(chb01.pred, testing$Y)
-
-write.csv(chb01.pred, "Prediction.csv")
-
